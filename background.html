@@ -1,0 +1,44 @@
+<html>
+<script type="text/javascript">
+    this.storage = {
+        'get': function(key) {
+            return localStorage[key];
+        },
+        'set': function(key, value) {
+            localStorage[key] = value;
+        }
+    }
+    
+    console.log(storage);
+    
+    function getCurrentTabInfo(callback) {
+        console.log('Getting current tab');
+        chrome.tabs.getSelected(null, function(tab) {
+            callback(tab);
+        });
+    }
+    
+    function saveNotes(notes) {
+        getCurrentTabInfo(function(tab) {
+            console.log(storage);
+            storage.set(tab.url, notes);
+            refresh();
+        });
+    }
+    
+    function refresh() {
+        getCurrentTabInfo(function(tab) {
+            var icon = 'no-notes.png';
+            if(storage.get(tab.url)) {
+                icon = 'has-notes.png';
+            }
+            chrome.browserAction.setIcon({'path': icon});
+        });
+    }
+    
+    chrome.tabs.onSelectionChanged.addListener(refresh);
+    chrome.tabs.onCreated.addListener(refresh);
+    refresh();
+    console.log('Background page: loaded');
+</script>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "My Notebook",
+  "version": "1.0",
+  "description": "Lets you add annotations to pages",
+  "background_page": "background.html",
+  "browser_action": {
+    "default_icon": "no-notes.png",
+    "default_title": "jsBook",
+    "popup": "popup.html"
+  },
+  "permissions": [
+    "tabs"
+  ]  
+}
