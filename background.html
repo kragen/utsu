@@ -9,10 +9,7 @@
         }
     }
     
-    console.log(storage);
-    
     function getCurrentTabInfo(callback) {
-        console.log('Getting current tab');
         chrome.tabs.getSelected(null, function(tab) {
             callback(tab);
         });
@@ -20,7 +17,6 @@
     
     function saveNotes(notes) {
         getCurrentTabInfo(function(tab) {
-            console.log(storage);
             storage.set(tab.url, notes);
             refresh();
         });
@@ -32,13 +28,17 @@
             if(storage.get(tab.url)) {
                 icon = 'has-notes.png';
             }
-            chrome.browserAction.setIcon({'path': icon});
+            chrome.browserAction.setIcon({
+              'path': icon,
+              'tabId': tab.id
+            });
         });
     }
     
-    chrome.tabs.onSelectionChanged.addListener(refresh);
-    chrome.tabs.onCreated.addListener(refresh);
+    ['onSelectionChanged', 'onCreated', 'onUpdated'].forEach(function(e) {
+      chrome.tabs[e].addListener(refresh);
+    });
+    
     refresh();
-    console.log('Background page: loaded');
 </script>
 </html>
