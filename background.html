@@ -35,9 +35,31 @@
         });
     }
     
+    function omniboxChanged(text, suggest) {
+        if(text === '') return;
+        
+        var urls = Object.keys(localStorage);
+        var suggestions = [];
+        urls.forEach(function(url) {
+          if(url.match(text)) {
+            var content = storage.get(url);
+            var description = '<url>' + content + '</url>';
+            description += '<dim> - ' + url + '</dim>';
+            suggestions.push({
+              'description': description,
+              'content': url,
+            });
+          }
+        });
+        
+        if(suggestions.length) suggest(suggestions);
+    }
+    
     ['onSelectionChanged', 'onCreated', 'onUpdated'].forEach(function(e) {
       chrome.tabs[e].addListener(refresh);
     });
+    
+    chrome.omnibox.onInputChanged.addListener(omniboxChanged);
     
     refresh();
 </script>

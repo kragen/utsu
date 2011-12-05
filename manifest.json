@@ -8,7 +8,7 @@
     "default_title": "jsBook",
     "popup": "popup.html"
   },
-  "omnibox": { "keyword" : "utsu" },
+  "omnibox": { "keyword" : "ut" },
   "icons": {
     "16": "no-notes.png"
   },  
