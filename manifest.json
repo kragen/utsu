@@ -10,7 +10,7 @@
   },
   "omnibox": { "keyword" : "ut" },
   "icons": {
-    "16": "no-notes.png"
+    "16": "has-notes.png"
   },  
   "permissions": [
     "tabs"

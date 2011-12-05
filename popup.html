@@ -36,10 +36,14 @@
         function init() {
             notes = $('#notes');
             bg.getCurrentTabInfo(function(info) {
-                var content = bg.storage.get(info.url) || null;
-                notes.val(content);
                 function save() {
                     bg.saveNotes(notes.val());
+                }
+                              
+                var doc = bg.storage.get(info.url);
+                
+                if(doc) {
+                  notes.val(doc.content);
                 }
                 
                 notes.bind('keyup', save);                

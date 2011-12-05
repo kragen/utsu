@@ -2,9 +2,28 @@
 <script type="text/javascript">
     this.storage = {
         'get': function(key) {
-            return localStorage[key];
+            var e;
+            var content = localStorage[key];
+            
+            if(content) {
+              console.log(content);
+              try {
+                content = JSON.parse(content);
+              } catch(e) {
+                console.warn('Could not parse ' + key);
+              }
+              
+              return content;
+            }
         },
         'set': function(key, value) {
+            if(typeof value === 'object') {
+              value = JSON.stringify(value);
+              console.log('Saving: ' + value);
+            } else {
+              console.warn('Storing string.');
+            }
+            
             localStorage[key] = value;
         }
     }
@@ -17,7 +36,13 @@
     
     function saveNotes(notes) {
         getCurrentTabInfo(function(tab) {
-            storage.set(tab.url, notes);
+            var doc = {
+              'url': tab.url,
+              'content': notes,
+              'date': Date()
+            }
+            
+            storage.set(tab.url, doc);
             refresh();
         });
     }
@@ -38,19 +63,35 @@
     function omniboxChanged(text, suggest) {
         if(text === '') return;
         
-        var urls = Object.keys(localStorage);
-        var suggestions = [];
-        urls.forEach(function(url) {
-          if(url.match(text)) {
-            var content = storage.get(url);
-            var description = '<url>' + content + '</url>';
-            description += '<dim> - ' + url + '</dim>';
+        var content = JSON.stringify(localStorage);
+        var pattern = "\s*(\{[^\{]*" + text + "[^\}]*\})"; // Rafa rulz
+        var regexp = new RegExp(pattern, 'gi');
+        var results = content.match(regexp);
+        var e, x;
+        var results;
+        var docs = [], suggestions = [];
+        
+        for(x in results) {
+          var result;
+          try {
+            result = results[x].replace(/\\/gi, '');
+            docs.push(JSON.parse(result));
+          } catch(e) {
+            result = results[x].split('":"')[1].replace(/\\/gi, '');
+            docs.push(JSON.parse(result));
+          }
+        }
+        
+        if(docs.length) {
+          docs.forEach(function(doc) {
+            var description = '<url>' + doc.content + '</url>';
+            description += '<dim> - ' + doc.url + '</dim>';
             suggestions.push({
               'description': description,
-              'content': url,
+              'content': doc.url
             });
-          }
-        });
+          });
+        }
         
         if(suggestions.length) suggest(suggestions);
     }
