@@ -5,7 +5,7 @@
   "background_page": "background.html",
   "browser_action": {
     "default_icon": "no-notes.png",
-    "default_title": "jsBook",
+    "default_title": "utsu",
     "popup": "popup.html"
   },
   "omnibox": { "keyword" : "ut" },
