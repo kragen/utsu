@@ -25,6 +25,10 @@
             }
             
             localStorage[key] = value;
+        },
+        'del': function(key) {
+            console.log('Removing ' + key);
+            delete localStorage[key];
         }
     }
     
@@ -42,7 +46,12 @@
               'date': Date()
             }
             
-            storage.set(tab.url, doc);
+            if(notes) {
+                storage.set(tab.url, doc);                
+            } else {
+                storage.del(tab.url);
+            }
+            
             refresh();
         });
     }
@@ -53,6 +62,7 @@
             if(storage.get(tab.url)) {
                 icon = 'has-notes.png';
             }
+            
             chrome.browserAction.setIcon({
               'path': icon,
               'tabId': tab.id
