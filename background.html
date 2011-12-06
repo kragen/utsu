@@ -29,6 +29,28 @@
         'del': function(key) {
             console.log('Removing ' + key);
             delete localStorage[key];
+        },
+        'search': function(text, callback) {
+            var content = JSON.stringify(localStorage);
+            var pattern = "\s*(\{[^\{]*" + text + "[^\}]*\})"; // Rafa rulz
+            var regexp = new RegExp(pattern, 'gi');
+            var results = content.match(regexp);
+            var e, x;
+            var results;
+            var docs = [];
+
+            for(x in results) {
+              var result;
+              try {
+                result = results[x].replace(/\\/gi, '');
+                docs.push(JSON.parse(result));
+              } catch(e) {
+                result = results[x].split('":"')[1].replace(/\\/gi, '');
+                docs.push(JSON.parse(result));
+              }
+            }
+            
+            callback(docs);
         }
     }
     
@@ -72,36 +94,19 @@
     
     function omniboxChanged(text, suggest) {
         if(text === '') return;
-        
-        var content = JSON.stringify(localStorage);
-        var pattern = "\s*(\{[^\{]*" + text + "[^\}]*\})"; // Rafa rulz
-        var regexp = new RegExp(pattern, 'gi');
-        var results = content.match(regexp);
-        var e, x;
-        var results;
-        var docs = [], suggestions = [];
-        
-        for(x in results) {
-          var result;
-          try {
-            result = results[x].replace(/\\/gi, '');
-            docs.push(JSON.parse(result));
-          } catch(e) {
-            result = results[x].split('":"')[1].replace(/\\/gi, '');
-            docs.push(JSON.parse(result));
-          }
-        }
-        
-        if(docs.length) {
-          docs.forEach(function(doc) {
-            var description = '<url>' + doc.content + '</url>';
-            description += '<dim> - ' + doc.url + '</dim>';
-            suggestions.push({
-              'description': description,
-              'content': doc.url
-            });
-          });
-        }
+        var suggestions = [];
+        storage.search(text, function(docs) {
+            if(docs.length) {
+              docs.forEach(function(doc) {
+                var description = '<url>' + doc.content + '</url>';
+                description += '<dim> - ' + doc.url + '</dim>';
+                suggestions.push({
+                  'description': description,
+                  'content': doc.url
+                });
+              });
+            }            
+        });
         
         if(suggestions.length) suggest(suggestions);
     }
